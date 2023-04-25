@@ -1,5 +1,7 @@
 package com.yellowsunn.ratelimits;
 
-public interface RateLimiterFactory {
+import java.io.Closeable;
+
+public interface RateLimiterFactory extends Closeable {
     RateLimiter getInstance();
 }

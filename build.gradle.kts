@@ -28,6 +28,7 @@ subprojects {
         implementation("com.google.guava:guava:${Versions.guava}")
         implementation("org.apache.commons:commons-lang3:${Versions.apacheCommons}")
         implementation("org.slf4j:slf4j-api:${Versions.slf4j}")
+        testImplementation("ch.qos.logback:logback-classic:${Versions.logback}")
         testImplementation("org.junit.jupiter:junit-jupiter:${Versions.junit}")
         testImplementation("org.assertj:assertj-core:${Versions.assertj}")
     }

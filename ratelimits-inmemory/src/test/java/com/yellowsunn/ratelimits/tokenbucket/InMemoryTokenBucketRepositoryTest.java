@@ -3,8 +3,6 @@ package com.yellowsunn.ratelimits.tokenbucket;
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.TimeUnit;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class InMemoryTokenBucketRepositoryTest {
