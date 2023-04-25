@@ -2,25 +2,19 @@ package com.yellowsunn.ratelimits;
 
 import com.yellowsunn.ratelimits.tokenbucket.InMemoryTokenBucketRepository;
 
-import java.util.concurrent.TimeUnit;
-
 public class InMemoryRateLimiterFactory implements RateLimiterFactory {
     private final int maxKeySize;
-    private final long expireKeyDuration;
-    private final TimeUnit timeUnit;
 
     public InMemoryRateLimiterFactory() {
-        this(10_000, 1L, TimeUnit.SECONDS);
+        this(10_000);
     }
 
-    public InMemoryRateLimiterFactory(int maxKeySize, long expireKeyDuration, TimeUnit timeUnit) {
+    public InMemoryRateLimiterFactory(int maxKeySize) {
         this.maxKeySize = maxKeySize;
-        this.expireKeyDuration = expireKeyDuration;
-        this.timeUnit = timeUnit;
     }
 
     @Override
     public RateLimiter getInstance() {
-        return new InMemoryTokenBucketRateLimiter(new InMemoryTokenBucketRepository(maxKeySize, expireKeyDuration, timeUnit));
+        return new InMemoryTokenBucketRateLimiter(new InMemoryTokenBucketRepository(maxKeySize));
     }
 }

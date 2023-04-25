@@ -6,8 +6,8 @@ import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 
 public class RateLimitRule {
-    private long capacity;
-    private Duration duration;
+    private final long capacity;
+    private final Duration duration;
 
     public RateLimitRule(long capacity, Duration duration) {
         requireNonNull(duration);

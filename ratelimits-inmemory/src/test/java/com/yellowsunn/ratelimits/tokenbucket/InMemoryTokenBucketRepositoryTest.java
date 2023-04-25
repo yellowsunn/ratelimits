@@ -1,5 +1,6 @@
 package com.yellowsunn.ratelimits.tokenbucket;
 
+import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
@@ -8,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class InMemoryTokenBucketRepositoryTest {
 
-    TokenBucketRepository tokenBucketRepository = new InMemoryTokenBucketRepository(10, 5L, TimeUnit.SECONDS);
+    TokenBucketRepository tokenBucketRepository = new InMemoryTokenBucketRepository(10);
 
     @Test
     void ShouldHave10TokenAmount() {
@@ -20,6 +21,7 @@ class InMemoryTokenBucketRepositoryTest {
         Long result = tokenBucketRepository.findTokenAmount(key);
 
         // then
+        assertThat(tokenBucketRepository.lastModifiedTime(key)).isCloseTo(System.currentTimeMillis() / 1000L, Offset.offset(2L));
         assertThat(result).isEqualTo(10L);
     }
 }

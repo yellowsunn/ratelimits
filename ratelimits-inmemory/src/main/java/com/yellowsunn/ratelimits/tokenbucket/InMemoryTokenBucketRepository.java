@@ -6,20 +6,19 @@ import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class InMemoryTokenBucketRepository implements TokenBucketRepository {
     private final Map<String, Long> tokenBuckets;
     private final Map<String, Long> lastModifiedTimes;
     private final TimeSupplier timeSupplier;
 
-    public InMemoryTokenBucketRepository(int maxKeySize, long expireKeyDuration, TimeUnit timeUnit) {
-        this(maxKeySize, expireKeyDuration, timeUnit, new DefaultTimeSupplier());
+    public InMemoryTokenBucketRepository(int maxKeySize) {
+        this(maxKeySize, new DefaultTimeSupplier());
     }
 
-    public InMemoryTokenBucketRepository(int maxKeySize, long expireKeyDuration, TimeUnit timeUnit, TimeSupplier timeSupplier) {
-        this.tokenBuckets = buildExpiringMap(maxKeySize, expireKeyDuration, timeUnit);
-        this.lastModifiedTimes = buildExpiringMap(maxKeySize, expireKeyDuration, timeUnit);
+    public InMemoryTokenBucketRepository(int maxKeySize, TimeSupplier timeSupplier) {
+        this.tokenBuckets = buildExpiringMap(maxKeySize);
+        this.lastModifiedTimes = buildExpiringMap(maxKeySize);
         this.timeSupplier = timeSupplier;
     }
 
@@ -56,11 +55,10 @@ public class InMemoryTokenBucketRepository implements TokenBucketRepository {
         return true;
     }
 
-    private Map<String, Long> buildExpiringMap(int maxKeySize, long expireKeyDuration, TimeUnit timeUnit) {
+    private Map<String, Long> buildExpiringMap(int maxKeySize) {
         return ExpiringMap.builder()
                 .maxSize(maxKeySize)
                 .expirationPolicy(ExpirationPolicy.ACCESSED)
-                .expiration(expireKeyDuration, timeUnit)
                 .build();
     }
 }
