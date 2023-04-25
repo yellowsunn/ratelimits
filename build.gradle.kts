@@ -1,19 +1,23 @@
 plugins {
     id("java")
+    `maven-publish`
 }
 
 group = "com.yellowsunn"
 version = "1.0-SNAPSHOT"
 
 allprojects {
+    apply(plugin = "java-library")
+
     repositories {
         mavenCentral()
+        maven("https://jitpack.io")
     }
-
-    apply(plugin = "java-library")
 }
 
 subprojects {
+    apply(plugin = "maven-publish")
+
     java {
         toolchain {
             languageVersion.set(JavaLanguageVersion.of(8))
@@ -30,5 +34,13 @@ subprojects {
 
     tasks.test {
         useJUnitPlatform()
+    }
+
+    publishing {
+        publications {
+            create<MavenPublication>("maven") {
+                from(components["java"])
+            }
+        }
     }
 }
