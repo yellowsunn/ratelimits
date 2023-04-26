@@ -4,9 +4,7 @@ import com.yellowsunn.ratelimits.tokenbucket.RedisTokenBucketRepository;
 import com.yellowsunn.ratelimits.tokenbucket.TokenBucketRepository;
 import io.lettuce.core.cluster.RedisClusterClient;
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
-import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
-import org.redisson.config.Config;
 
 class RedisClusterRateLimiterFactory extends AbstractRateLimiterFactory {
     private final RedisClusterClient redisClusterClient;
@@ -15,9 +13,9 @@ class RedisClusterRateLimiterFactory extends AbstractRateLimiterFactory {
 
     private final RateLimiter rateLimiter;
 
-    public RedisClusterRateLimiterFactory(RedisClusterClient redisClusterClient, Config redissonConfig) {
+    public RedisClusterRateLimiterFactory(RedisClusterClient redisClusterClient, RedissonClient redissonClient) {
         this.redisClusterClient = redisClusterClient;
-        this.redissonClient = Redisson.create(redissonConfig);
+        this.redissonClient = redissonClient;
         this.connect = redisClusterClient.connect();
 
         this.rateLimiter = createRateLimiter();

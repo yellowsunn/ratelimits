@@ -17,6 +17,7 @@ public class RateLimitRule {
         if (isLessThanSecond(duration)) {
             throw new IllegalArgumentException("Duration must be greater than or equal to 1 second.");
         }
+        Duration.ofSeconds(1L);
         this.capacity = capacity;
         this.duration = duration;
     }
