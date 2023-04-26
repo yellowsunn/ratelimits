@@ -26,18 +26,23 @@ public class InMemoryTokenBucketRateLimiter implements RateLimiter {
         requireNonNull(rule);
 
         synchronized (this) {
-            Long tokenAmount = tokenBucketRepository.findTokenAmount(key);
-            if (tokenAmount == null) {
-                tokenBucketRepository.saveTokenAmount(key, rule.getCapacity() - 1);
-                return true;
-            }
-
-            tokenAmount = refill(key, rule, tokenAmount);
-            if (tokenAmount <= 0L) {
-                return false;
-            }
-            return tokenBucketRepository.decrementTokenAmount(key);
+            return acquireToken(key, rule);
         }
+    }
+
+    private boolean acquireToken(String key, RateLimitRule rule) {
+        Long tokenAmount = tokenBucketRepository.findTokenAmount(key);
+        if (tokenAmount == null) {
+            tokenBucketRepository.saveTokenAmount(key, rule.getCapacity() - 1);
+            return true;
+        }
+
+        tokenAmount = refill(key, rule, tokenAmount);
+        if (tokenAmount <= 0L) {
+            return false;
+        }
+
+        return tokenBucketRepository.decrementTokenAmount(key);
     }
 
     @Override

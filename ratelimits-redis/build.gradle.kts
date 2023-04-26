@@ -6,4 +6,5 @@ dependencies {
     implementation("org.redisson:redisson:${Versions.redisson}")
     testImplementation("org.testcontainers:testcontainers:${Versions.testcontainers}")
     testImplementation("org.testcontainers:junit-jupiter:${Versions.testcontainers}")
+    testImplementation(testFixtures(project(":ratelimits-test")))
 }
