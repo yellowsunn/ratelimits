@@ -21,8 +21,8 @@ allprojects {
 #### Add the dependency
 ```gradle
 dependencies {
-    implementation 'com.github.yellowsunn.ratelimits:ratelimits-core:1.0.0'
-    implementation 'com.github.yellowsunn.ratelimits:ratelimits-inmemory:1.0.0'
+    implementation 'com.github.yellowsunn.ratelimits:ratelimits-core:1.0.1'
+    implementation 'com.github.yellowsunn.ratelimits:ratelimits-inmemory:1.0.1'
 }
 ```
 
@@ -44,8 +44,8 @@ Rate limiting with Redis storage and distributed lock control with Redisson.
 #### Add the dependency
 ```gradle
 dependencies {
-    implementation 'com.github.yellowsunn.ratelimits:ratelimits-core:1.0.0'
-    implementation 'com.github.yellowsunn.ratelimits:ratelimits-redis:1.0.0'
+    implementation 'com.github.yellowsunn.ratelimits:ratelimits-core:1.0.1'
+    implementation 'com.github.yellowsunn.ratelimits:ratelimits-redis:1.0.1'
 }
 ```
 
@@ -54,11 +54,11 @@ dependencies {
 // Rule that allows 10 requests per second.
 RateLimitRule rule = new RateLimitRule(10, Duration.ofSeconds(1L));
 
-// Redis Standalone server
-RateLimiterFactory factory = new RedisRateLimiterFactory("127.0.0.1", 6379);
-//// When using Redis cluster, pass RedisClusterClient and Redisson config as parameters.
-// RateLimiterFactory factory = new RedisRateLimiterFactory(new RedisClusterClient(...), new Config(...));
+String redisUri = "redis://127.0.0.1:6379";
+Config config = new Config();
+config.useSingleServer().setAddress(redisUri);
 
+RateLimiterFactory factory = new RedisRateLimiterFactory(RedisClient.create(redisUri), Redisson.create(config));
 RateLimiter rateLimiter = factory.getInstance();
 
 // Represents whether acquisition was successful.
