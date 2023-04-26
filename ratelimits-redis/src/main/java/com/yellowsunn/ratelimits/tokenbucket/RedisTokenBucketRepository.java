@@ -2,18 +2,18 @@ package com.yellowsunn.ratelimits.tokenbucket;
 
 import com.yellowsunn.ratelimits.time.DefaultTimeSupplier;
 import com.yellowsunn.ratelimits.time.TimeSupplier;
-import io.lettuce.core.api.sync.RedisCommands;
+import io.lettuce.core.cluster.api.sync.RedisClusterCommands;
 import org.apache.commons.lang3.StringUtils;
 
 public class RedisTokenBucketRepository implements TokenBucketRepository {
-    private final RedisCommands<String, String> redisCommands;
+    private final RedisClusterCommands<String, String> redisCommands;
     private final TimeSupplier timeSupplier;
 
-    public RedisTokenBucketRepository(RedisCommands<String, String> redisCommands) {
+    public RedisTokenBucketRepository(RedisClusterCommands<String, String> redisCommands) {
         this(redisCommands, new DefaultTimeSupplier());
     }
 
-    public RedisTokenBucketRepository(RedisCommands<String, String> redisCommands, TimeSupplier timeSupplier) {
+    public RedisTokenBucketRepository(RedisClusterCommands<String, String> redisCommands, TimeSupplier timeSupplier) {
         this.redisCommands = redisCommands;
         this.timeSupplier = timeSupplier;
     }

@@ -2,23 +2,23 @@ package com.yellowsunn.ratelimits;
 
 import com.yellowsunn.ratelimits.tokenbucket.RedisTokenBucketRepository;
 import com.yellowsunn.ratelimits.tokenbucket.TokenBucketRepository;
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.cluster.RedisClusterClient;
+import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 
-class RedisStandAloneRateLimiterFactory extends AbstractRateLimiterFactory {
-    private final RedisClient redisClient;
+class RedisClusterRateLimiterFactory extends AbstractRateLimiterFactory {
+    private final RedisClusterClient redisClusterClient;
     private final RedissonClient redissonClient;
-    private final StatefulRedisConnection<String, String> connection;
+    private final StatefulRedisClusterConnection<String, String> connect;
 
     private final RateLimiter rateLimiter;
 
-    public RedisStandAloneRateLimiterFactory(RedisClient redisClient, Config redissonConfig) {
-        this.redisClient = redisClient;
+    public RedisClusterRateLimiterFactory(RedisClusterClient redisClusterClient, Config redissonConfig) {
+        this.redisClusterClient = redisClusterClient;
         this.redissonClient = Redisson.create(redissonConfig);
-        this.connection = redisClient.connect();
+        this.connect = redisClusterClient.connect();
 
         this.rateLimiter = createRateLimiter();
     }
@@ -30,13 +30,13 @@ class RedisStandAloneRateLimiterFactory extends AbstractRateLimiterFactory {
 
     @Override
     public void close() {
-        connection.close();
-        redisClient.shutdown();
+        connect.close();
+        redisClusterClient.shutdown();
     }
 
     @Override
     protected TokenBucketRepository createTokenBucketRepository() {
-        return new RedisTokenBucketRepository(connection.sync());
+        return new RedisTokenBucketRepository(connect.sync());
     }
 
     @Override

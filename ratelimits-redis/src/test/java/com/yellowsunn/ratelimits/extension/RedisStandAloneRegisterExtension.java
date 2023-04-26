@@ -1,5 +1,6 @@
 package com.yellowsunn.ratelimits.extension;
 
+import com.yellowsunn.ratelimits.testcontainer.RedisTestContainer;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import io.lettuce.core.api.StatefulRedisConnection;
@@ -10,24 +11,12 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.utility.DockerImageName;
 
-public class RedisStandAloneRegisterExtension implements BeforeAllCallback, AfterAllCallback {
+public class RedisStandAloneRegisterExtension extends RedisTestContainer implements BeforeAllCallback, AfterAllCallback {
     private RedisClient redisClient;
     private RedissonClient redissonClient;
     private StatefulRedisConnection<String, String> connect;
     private RedisCommands<String, String> redisCommands;
-
-    private static final String REDIS_HOST = "127.0.0.1";
-    private static final int REDIS_PORT = 6379;
-    private static final GenericContainer<?> REDIS_CONTAINER;
-
-    static {
-        REDIS_CONTAINER = new GenericContainer(DockerImageName.parse("redis").withTag("6-alpine"))
-                .withExposedPorts(REDIS_PORT);
-        REDIS_CONTAINER.start();
-    }
 
     @Override
     public void beforeAll(ExtensionContext context) {
