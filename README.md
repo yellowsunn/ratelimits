@@ -1,5 +1,5 @@
 # ratelimits
-Java library for rate limiting. This library is implemented using the [token bucket algorithm](https://en.wikipedia.org/wiki/Token_bucket).
+Java library for rate limiting. This library was implemented using the [token bucket algorithm](https://en.wikipedia.org/wiki/Token_bucket).
 
 
 ## Setup
