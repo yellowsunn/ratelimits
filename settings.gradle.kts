@@ -5,4 +5,5 @@ include(
     "ratelimits-inmemory",
     "ratelimits-redis",
     "ratelimits-test",
+    "ratelimits-examples",
 )
