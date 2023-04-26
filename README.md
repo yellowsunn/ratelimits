@@ -1,9 +1,9 @@
 # ratelimits
-Java library for rate limiting. This library is implemented using the [token bucket algorithm]("https://en.wikipedia.org/wiki/Token_bucket").
+Java library for rate limiting. This library is implemented using the [token bucket algorithm](https://en.wikipedia.org/wiki/Token_bucket).
 
 
 ## Setup
-This library has been published on [JitPack]("https://jitpack.io/#yellowsunn/ratelimits/1.0.0").
+This library has been published on [JitPack](https://jitpack.io/#yellowsunn/ratelimits/1.0.0).
 
 Add it in your root build.gradle at the end of repositories.
 ```gradle
