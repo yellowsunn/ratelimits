@@ -5,6 +5,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.yellowsunn.ratelimits.RateLimitRule;
 import io.lettuce.core.cluster.api.sync.RedisClusterCommands;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Clock;
 
@@ -12,6 +14,8 @@ public class RedisTokenBucketRepository implements TokenBucketRepository {
     private final RedisClusterCommands<String, String> redisCommands;
     private final Clock clock;
     private final ObjectMapper objectMapper;
+
+    private Logger log = LoggerFactory.getLogger(getClass());
 
     public RedisTokenBucketRepository(RedisClusterCommands<String, String> redisCommands) {
         this(redisCommands, Clock.systemUTC());
@@ -25,7 +29,12 @@ public class RedisTokenBucketRepository implements TokenBucketRepository {
 
     @Override
     public Bucket findBucket(String key) {
-        return getRedisValue(key);
+        try {
+            return getRedisValue(key);
+        } catch (Exception e) {
+            log.error("Failed to get bucket. key={}", key, e);
+            return null;
+        }
     }
 
     @Override
