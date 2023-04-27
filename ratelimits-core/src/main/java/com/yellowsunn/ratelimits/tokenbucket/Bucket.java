@@ -10,7 +10,7 @@ public class Bucket {
     private long amount;
     private long lastRefillTime; // Unix time
     private final RateLimitRule rule;
-    private final Clock clock;
+    private Clock clock;
 
     public Bucket(RateLimitRule rule) {
         this(rule, Clock.systemUTC());
@@ -21,6 +21,13 @@ public class Bucket {
         this.clock = clock;
         this.lastRefillTime = Instant.now(clock).getEpochSecond();
         this.rule = rule;
+    }
+
+    protected Bucket(long amount, long lastRefillTime, RateLimitRule rule) {
+        this.amount = amount;
+        this.lastRefillTime = lastRefillTime;
+        this.rule = rule;
+        this.clock = Clock.systemUTC();
     }
 
     public boolean tryAcquireToken() {
@@ -37,9 +44,8 @@ public class Bucket {
         return true;
     }
 
-    public void reset() {
-        this.amount = rule.getCapacity();
-        this.lastRefillTime = getNowEpochSecond();
+    protected void changeClock(Clock clock) {
+        this.clock = clock;
     }
 
     public long getAmount() {

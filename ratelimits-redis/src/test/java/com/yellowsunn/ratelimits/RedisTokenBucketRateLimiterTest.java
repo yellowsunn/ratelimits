@@ -1,7 +1,6 @@
 package com.yellowsunn.ratelimits;
 
 import com.yellowsunn.ratelimits.extension.RedisStandAloneRegisterExtension;
-import com.yellowsunn.ratelimits.time.TimeBanditSupplier;
 import com.yellowsunn.ratelimits.tokenbucket.RedisTokenBucketRepository;
 import com.yellowsunn.ratelimits.tokenbucket.TokenBucketRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,8 +13,7 @@ class RedisTokenBucketRateLimiterTest extends AbstractRateLimiterTest {
 
     @BeforeEach
     void setUp() {
-        timeSupplier = new TimeBanditSupplier();
-        tokenBucketRepository = new RedisTokenBucketRepository(extension.getRedisCommands(), timeSupplier);
-        rateLimiter = new RedisTokenBucketRateLimiter(tokenBucketRepository, extension.getRedissonClient(), timeSupplier);
+        tokenBucketRepository = new RedisTokenBucketRepository(extension.getRedisCommands(), super.clock);
+        rateLimiter = new RedisTokenBucketRateLimiter(tokenBucketRepository, extension.getRedissonClient());
     }
 }
