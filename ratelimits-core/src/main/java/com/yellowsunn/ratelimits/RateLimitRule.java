@@ -45,4 +45,12 @@ public class RateLimitRule {
     public int hashCode() {
         return Objects.hash(capacity, duration);
     }
+
+    @Override
+    public String toString() {
+        return "RateLimitRule{" +
+                "capacity=" + capacity +
+                ", duration=" + duration +
+                '}';
+    }
 }

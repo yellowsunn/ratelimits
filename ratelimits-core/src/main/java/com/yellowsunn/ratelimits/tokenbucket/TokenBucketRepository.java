@@ -1,13 +1,13 @@
 package com.yellowsunn.ratelimits.tokenbucket;
 
+import com.yellowsunn.ratelimits.RateLimitRule;
+
 public interface TokenBucketRepository {
-    boolean saveTokenAmount(String key, long amount);
+    Bucket findBucket(String key);
 
-    Long findTokenAmount(String key);
+    Bucket createBucketByRule(String key, RateLimitRule rule);
 
-    Long lastModifiedTime(String key);
+    void saveBucket(String key, Bucket bucket);
 
-    boolean decrementTokenAmount(String key);
-
-    boolean deleteKey(String key);
+    boolean deleteBucket(String key);
 }
