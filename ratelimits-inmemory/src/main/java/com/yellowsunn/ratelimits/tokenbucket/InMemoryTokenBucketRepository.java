@@ -8,6 +8,7 @@ import java.time.Clock;
 import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.ObjectUtils.notEqual;
 
 public class InMemoryTokenBucketRepository implements TokenBucketRepository {
     private final Map<String, Bucket> buckets;
@@ -26,11 +27,16 @@ public class InMemoryTokenBucketRepository implements TokenBucketRepository {
     }
 
     @Override
-    public Bucket findBucket(String key) {
+    public Bucket findBucketByRule(String key, RateLimitRule rule) {
+        requireNonNull(rule);
         if (key == null) {
             return null;
         }
-        return buckets.get(key);
+        Bucket bucket = buckets.get(key);
+        if (bucket == null || notEqual(rule, bucket.getRule())) {
+            return null;
+        }
+        return bucket;
     }
 
     @Override

@@ -45,7 +45,7 @@ public class RedisTokenBucketRateLimiter implements RateLimiter {
     }
 
     private boolean acquireToken(String key, RateLimitRule rule) {
-        Bucket bucket = tokenBucketRepository.findBucket(key);
+        Bucket bucket = tokenBucketRepository.findBucketByRule(key, rule);
         if (bucket == null) {
             bucket = tokenBucketRepository.createBucketByRule(key, rule);
         }

@@ -3,7 +3,7 @@ package com.yellowsunn.ratelimits.tokenbucket;
 import com.yellowsunn.ratelimits.RateLimitRule;
 
 public interface TokenBucketRepository {
-    Bucket findBucket(String key);
+    Bucket findBucketByRule(String key, RateLimitRule rule);
 
     Bucket createBucketByRule(String key, RateLimitRule rule);
 

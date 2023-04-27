@@ -26,7 +26,7 @@ public abstract class AbstractTokenBucketRepositoryTest {
         tokenBucketRepository.createBucketByRule(key, rule);
 
         // when
-        Bucket bucket = tokenBucketRepository.findBucket(key);
+        Bucket bucket = tokenBucketRepository.findBucketByRule(key, rule);
         bucket.tryAcquireToken();
 
         // then
@@ -42,7 +42,7 @@ public abstract class AbstractTokenBucketRepositoryTest {
 
         tokenBucketRepository.createBucketByRule(key, rule);
 
-        Bucket bucket = tokenBucketRepository.findBucket(key);
+        Bucket bucket = tokenBucketRepository.findBucketByRule(key, rule);
         assertThat(bucket.tryAcquireToken()).isTrue();
         assertThat(bucket.tryAcquireToken()).isTrue();
         assertThat(bucket.tryAcquireToken()).isFalse();
@@ -58,7 +58,7 @@ public abstract class AbstractTokenBucketRepositoryTest {
         given(clock.instant()).willReturn(mockInstant);
         tokenBucketRepository.createBucketByRule(key, rule);
 
-        Bucket bucket = tokenBucketRepository.findBucket(key);
+        Bucket bucket = tokenBucketRepository.findBucketByRule(key, rule);
         assertThat(bucket.tryAcquireToken()).isTrue();
 
         given(clock.instant()).willReturn(mockInstant.plusMillis(500));

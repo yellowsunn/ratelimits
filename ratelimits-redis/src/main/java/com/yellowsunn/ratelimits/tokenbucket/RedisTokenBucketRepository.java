@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Clock;
 
+import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.ObjectUtils.notEqual;
+
 public class RedisTokenBucketRepository implements TokenBucketRepository {
     private final RedisClusterCommands<String, String> redisCommands;
     private final Clock clock;
@@ -28,9 +31,14 @@ public class RedisTokenBucketRepository implements TokenBucketRepository {
     }
 
     @Override
-    public Bucket findBucket(String key) {
+    public Bucket findBucketByRule(String key, RateLimitRule rule) {
+        requireNonNull(rule);
         try {
-            return getRedisValue(key);
+            Bucket bucket = getRedisValue(key);
+            if (bucket == null || notEqual(bucket.getRule(), rule)) {
+                return null;
+            }
+            return bucket;
         } catch (Exception e) {
             log.error("Failed to get bucket. key={}", key, e);
             return null;

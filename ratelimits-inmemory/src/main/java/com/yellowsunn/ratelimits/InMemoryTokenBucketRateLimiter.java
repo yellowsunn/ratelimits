@@ -18,7 +18,7 @@ public class InMemoryTokenBucketRateLimiter implements RateLimiter {
         requireNonNull(rule);
 
         synchronized (this) {
-            Bucket bucket = tokenBucketRepository.findBucket(key);
+            Bucket bucket = tokenBucketRepository.findBucketByRule(key, rule);
             if (bucket == null) {
                 bucket = tokenBucketRepository.createBucketByRule(key, rule);
             }
