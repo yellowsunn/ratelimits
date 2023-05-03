@@ -21,8 +21,8 @@ allprojects {
 #### Add the dependency
 ```gradle
 dependencies {
-    implementation 'com.github.yellowsunn.ratelimits:ratelimits-core:1.0.1'
-    implementation 'com.github.yellowsunn.ratelimits:ratelimits-inmemory:1.0.1'
+    implementation 'com.github.yellowsunn.ratelimits:ratelimits-core:1.1.0'
+    implementation 'com.github.yellowsunn.ratelimits:ratelimits-inmemory:1.1.0'
 }
 ```
 
@@ -44,8 +44,8 @@ Rate limiting with Redis storage and distributed lock control with Redisson.
 #### Add the dependency
 ```gradle
 dependencies {
-    implementation 'com.github.yellowsunn.ratelimits:ratelimits-core:1.0.1'
-    implementation 'com.github.yellowsunn.ratelimits:ratelimits-redis:1.0.1'
+    implementation 'com.github.yellowsunn.ratelimits:ratelimits-core:1.1.0'
+    implementation 'com.github.yellowsunn.ratelimits:ratelimits-redis:1.1.0'
 }
 ```
 
