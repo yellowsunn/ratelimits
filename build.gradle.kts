@@ -31,6 +31,7 @@ subprojects {
         testImplementation("ch.qos.logback:logback-classic:${Versions.logback}")
         testImplementation("org.junit.jupiter:junit-jupiter:${Versions.junit}")
         testImplementation("org.assertj:assertj-core:${Versions.assertj}")
+        testImplementation("org.mockito:mockito-all:${Versions.mockito}")
     }
 
     tasks.test {

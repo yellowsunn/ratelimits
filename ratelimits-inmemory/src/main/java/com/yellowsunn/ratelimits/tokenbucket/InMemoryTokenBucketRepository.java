@@ -1,64 +1,64 @@
 package com.yellowsunn.ratelimits.tokenbucket;
 
-import com.yellowsunn.ratelimits.time.DefaultTimeSupplier;
-import com.yellowsunn.ratelimits.time.TimeSupplier;
+import com.yellowsunn.ratelimits.RateLimitRule;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 
+import java.time.Clock;
 import java.util.Map;
 
+import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.ObjectUtils.notEqual;
+
 public class InMemoryTokenBucketRepository implements TokenBucketRepository {
-    private final Map<String, Long> tokenBuckets;
-    private final Map<String, Long> lastModifiedTimes;
-    private final TimeSupplier timeSupplier;
+    private final Map<String, Bucket> buckets;
+    private final Clock clock;
 
     public InMemoryTokenBucketRepository(int maxKeySize) {
-        this(maxKeySize, new DefaultTimeSupplier());
+        this(maxKeySize, Clock.systemUTC());
     }
 
-    public InMemoryTokenBucketRepository(int maxKeySize, TimeSupplier timeSupplier) {
-        this.tokenBuckets = buildExpiringMap(maxKeySize);
-        this.lastModifiedTimes = buildExpiringMap(maxKeySize);
-        this.timeSupplier = timeSupplier;
-    }
-
-    @Override
-    public boolean saveTokenAmount(String key, long amount) {
-        tokenBuckets.put(key, amount);
-        lastModifiedTimes.put(key, timeSupplier.now());
-        return true;
-    }
-
-    @Override
-    public Long findTokenAmount(String key) {
-        return tokenBuckets.get(key);
-    }
-
-    @Override
-    public Long lastModifiedTime(String key) {
-        return lastModifiedTimes.get(key);
-    }
-
-    @Override
-    public boolean decrementTokenAmount(String key) {
-        Long amount = tokenBuckets.get(key);
-        if (amount == null) {
-            return false;
-        }
-        return saveTokenAmount(key, amount - 1);
-    }
-
-    @Override
-    public boolean deleteKey(String key) {
-        tokenBuckets.remove(key);
-        lastModifiedTimes.remove(key);
-        return true;
-    }
-
-    private Map<String, Long> buildExpiringMap(int maxKeySize) {
-        return ExpiringMap.builder()
+    public InMemoryTokenBucketRepository(int maxKeySize, Clock clock) {
+        this.buckets = ExpiringMap.builder()
                 .maxSize(maxKeySize)
                 .expirationPolicy(ExpirationPolicy.ACCESSED)
                 .build();
+        this.clock = clock;
+    }
+
+    @Override
+    public Bucket findBucketByRule(String key, RateLimitRule rule) {
+        requireNonNull(rule);
+        if (key == null) {
+            return null;
+        }
+        Bucket bucket = buckets.get(key);
+        if (bucket == null || notEqual(rule, bucket.getRule())) {
+            return null;
+        }
+        return bucket;
+    }
+
+    @Override
+    public Bucket createBucketByRule(String key, RateLimitRule rule) {
+        requireNonNull(key);
+        requireNonNull(rule);
+        buckets.put(key, new Bucket(rule, clock));
+        return buckets.get(key);
+    }
+
+    @Override
+    public void saveBucket(String key, Bucket bucket) {
+        requireNonNull(key);
+        requireNonNull(bucket);
+
+        buckets.put(key, bucket);
+    }
+
+    @Override
+    public boolean deleteBucket(String key) {
+        requireNonNull(key);
+        buckets.remove(key);
+        return true;
     }
 }

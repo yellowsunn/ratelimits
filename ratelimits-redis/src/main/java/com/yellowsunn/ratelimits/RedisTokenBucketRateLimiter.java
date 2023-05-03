@@ -1,7 +1,6 @@
 package com.yellowsunn.ratelimits;
 
-import com.yellowsunn.ratelimits.time.DefaultTimeSupplier;
-import com.yellowsunn.ratelimits.time.TimeSupplier;
+import com.yellowsunn.ratelimits.tokenbucket.Bucket;
 import com.yellowsunn.ratelimits.tokenbucket.TokenBucketRepository;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -15,20 +14,13 @@ import static java.util.Objects.requireNonNull;
 public class RedisTokenBucketRateLimiter implements RateLimiter {
     private final RedissonClient redissonClient;
     private final TokenBucketRepository tokenBucketRepository;
-    private final TimeSupplier timeSupplier;
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    public RedisTokenBucketRateLimiter(TokenBucketRepository tokenBucketRepository, RedissonClient redissonClient) {
-        this(tokenBucketRepository, redissonClient, new DefaultTimeSupplier());
-    }
-
     public RedisTokenBucketRateLimiter(TokenBucketRepository tokenBucketRepository,
-                                       RedissonClient redissonClient,
-                                       TimeSupplier timeSupplier) {
+                                       RedissonClient redissonClient) {
         this.tokenBucketRepository = tokenBucketRepository;
         this.redissonClient = redissonClient;
-        this.timeSupplier = timeSupplier;
     }
 
     @Override
@@ -53,44 +45,21 @@ public class RedisTokenBucketRateLimiter implements RateLimiter {
     }
 
     private boolean acquireToken(String key, RateLimitRule rule) {
-        Long tokenAmount = tokenBucketRepository.findTokenAmount(key);
-        if (tokenAmount == null) {
-            tokenBucketRepository.saveTokenAmount(key, rule.getCapacity() - 1);
-            return true;
+        Bucket bucket = tokenBucketRepository.findBucketByRule(key, rule);
+        if (bucket == null) {
+            bucket = tokenBucketRepository.createBucketByRule(key, rule);
         }
 
-        tokenAmount = refill(key, rule, tokenAmount);
-        if (tokenAmount <= 0L) {
-            return false;
+        boolean isAcquired = bucket.tryAcquireToken();
+        if (isAcquired) {
+            tokenBucketRepository.saveBucket(key, bucket);
         }
-
-        return tokenBucketRepository.decrementTokenAmount(key);
+        return isAcquired;
     }
 
     @Override
     public boolean resetLimit(String key) {
         requireNonNull(key);
-        return tokenBucketRepository.deleteKey(key);
-    }
-
-    private long refill(String key, RateLimitRule rule, long tokenAmount) {
-        long refillAmount = refillAmount(key, rule);
-        if (refillAmount > 0) {
-            long newAmount = Math.min(tokenAmount + refillAmount, rule.getCapacity());
-            tokenBucketRepository.saveTokenAmount(key, newAmount);
-            return newAmount;
-        }
-        return tokenAmount;
-    }
-
-    private long refillAmount(String key, RateLimitRule rule) {
-        long now = timeSupplier.now();
-        Long lastModifiedTime = tokenBucketRepository.lastModifiedTime(key);
-        if (lastModifiedTime == null || now < lastModifiedTime) {
-            return rule.getCapacity();
-        }
-
-        double elapsedTime = (double) now - lastModifiedTime;
-        return (long) (elapsedTime * rule.getCapacity() / rule.getDuration().getSeconds());
+        return tokenBucketRepository.deleteBucket(key);
     }
 }

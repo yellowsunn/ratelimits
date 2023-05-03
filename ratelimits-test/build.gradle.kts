@@ -8,4 +8,5 @@ dependencies {
     testFixturesImplementation(project(":ratelimits-core"))
     testFixturesImplementation("org.junit.jupiter:junit-jupiter:${Versions.junit}")
     testFixturesImplementation("org.assertj:assertj-core:${Versions.assertj}")
+    testFixturesImplementation("org.mockito:mockito-all:${Versions.mockito}")
 }

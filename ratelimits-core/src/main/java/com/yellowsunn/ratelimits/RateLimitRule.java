@@ -36,7 +36,7 @@ public class RateLimitRule {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof RateLimitRule)) return false;
         RateLimitRule that = (RateLimitRule) o;
         return capacity == that.capacity && Objects.equals(duration, that.duration);
     }

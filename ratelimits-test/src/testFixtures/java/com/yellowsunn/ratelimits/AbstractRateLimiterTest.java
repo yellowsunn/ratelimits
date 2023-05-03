@@ -1,9 +1,11 @@
 package com.yellowsunn.ratelimits;
 
-import com.yellowsunn.ratelimits.time.TimeBanditSupplier;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
+import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -12,17 +14,19 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 
 public abstract class AbstractRateLimiterTest {
-    TimeBanditSupplier timeSupplier;
     RateLimiter rateLimiter;
+    Clock clock = Mockito.mock(Clock.class);
 
     @Test
     void shouldHaveConcurrent10AcquireCount() throws InterruptedException {
         int threadCount = 100;
         ExecutorService executorService = Executors.newFixedThreadPool(32);
         CountDownLatch latch = new CountDownLatch(threadCount);
-        String key = "test-key-" + UUID.randomUUID();
+        String key = "ip:127.0.0.1_" + UUID.randomUUID();
+        given(clock.instant()).willReturn(Instant.now());
 
         RateLimitRule rateLimitRule = new RateLimitRule(10, Duration.ofSeconds(1L));
 
@@ -48,14 +52,16 @@ public abstract class AbstractRateLimiterTest {
     void shouldRefillToken() {
         RateLimitRule rateLimitRule = new RateLimitRule(1, Duration.ofSeconds(1L));
         AtomicLong acquireCount = new AtomicLong(0L);
-        String key = "test-key-" + UUID.randomUUID();
+        String key = "ip:127.0.0.1_" + UUID.randomUUID();
+        Instant mockInstant = Instant.ofEpochMilli(1000000);
+        given(clock.instant()).willReturn(mockInstant);
 
         IntStream.rangeClosed(1, 50).forEach(i -> {
             boolean isSuccess = rateLimiter.acquire(key, rateLimitRule);
             if (isSuccess) {
                 acquireCount.incrementAndGet();
             }
-            timeSupplier.addUnixTime(500);
+            given(clock.instant()).willReturn(mockInstant.plusMillis(i * 500L));
         });
 
         assertThat(acquireCount.get()).isEqualTo(25L);
@@ -63,7 +69,8 @@ public abstract class AbstractRateLimiterTest {
 
     @Test
     void shouldResetLimitToken() {
-        String key = "test-key-" + UUID.randomUUID();
+        String key = "ip:127.0.0.1_" + UUID.randomUUID();
+        given(clock.instant()).willReturn(Instant.now());
 
         RateLimitRule rateLimitRule = new RateLimitRule(100L, Duration.ofSeconds(1));
         IntStream.rangeClosed(1, 100).forEach(i ->

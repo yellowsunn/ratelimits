@@ -9,4 +9,6 @@ object Versions {
     const val lettuce = "6.2.4.RELEASE"
     const val logback = "1.3.7"
     const val testcontainers = "1.18.0"
+    const val mockito = "1.10.19"
+    const val jackson = "2.15.0"
 }
